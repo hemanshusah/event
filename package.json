@@ -1,0 +1,54 @@
+{
+  "name": "growth-catalyst-platform",
+  "version": "1.0.0",
+  "description": "The Growth Catalyst Platform - Investment Funnel Management System",
+  "private": true,
+  "workspaces": [
+    "mobile-apps/*",
+    "web-admin",
+    "backend/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\" \"npm run dev:mobile\"",
+    "dev:backend": "cd backend/api-gateway && npm run dev",
+    "dev:web": "cd web-admin && npm run dev",
+    "dev:mobile": "cd mobile-apps/ios && npm run ios",
+    "build": "npm run build:backend && npm run build:web && npm run build:mobile",
+    "build:backend": "cd backend/api-gateway && npm run build",
+    "build:web": "cd web-admin && npm run build",
+    "build:mobile": "cd mobile-apps/ios && npm run build:ios && cd ../android && npm run build:android",
+    "test": "npm run test:backend && npm run test:web && npm run test:mobile",
+    "test:backend": "cd backend/api-gateway && npm test",
+    "test:web": "cd web-admin && npm test",
+    "test:mobile": "cd mobile-apps/ios && npm test",
+    "lint": "npm run lint:backend && npm run lint:web && npm run lint:mobile",
+    "lint:backend": "cd backend/api-gateway && npm run lint",
+    "lint:web": "cd web-admin && npm run lint",
+    "lint:mobile": "cd mobile-apps/ios && npm run lint",
+    "db:migrate": "cd backend/api-gateway && npm run db:migrate",
+    "db:seed": "cd backend/api-gateway && npm run db:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "investment",
+    "startup",
+    "deal-flow",
+    "event-management",
+    "mobile-app",
+    "web-admin"
+  ],
+  "author": "Dazuservices",
+  "license": "UNLICENSED"
+}

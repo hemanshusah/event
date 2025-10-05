@@ -1,0 +1,21 @@
+# Global code owners
+* @dazuservices
+
+# Backend code owners
+/backend/ @dazuservices/backend-team
+
+# Frontend code owners
+/web-admin/ @dazuservices/frontend-team
+
+# Mobile app code owners
+/mobile-apps/ @dazuservices/mobile-team
+
+# Database and infrastructure
+/database/ @dazuservices/devops-team
+/deployment/ @dazuservices/devops-team
+/.github/ @dazuservices/devops-team
+
+# Documentation
+/docs/ @dazuservices/docs-team
+README.md @dazuservices
+DEVELOPMENT.md @dazuservices
