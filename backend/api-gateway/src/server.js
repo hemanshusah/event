@@ -11,6 +11,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const eventRoutes = require('./routes/events');
+const eventInvitationRoutes = require('./routes/event-invitations');
 const startupRoutes = require('./routes/startups');
 const investorRoutes = require('./routes/investors');
 const notificationRoutes = require('./routes/notifications');
@@ -71,6 +72,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/event-invitations', eventInvitationRoutes);
 app.use('/api/startups', startupRoutes);
 app.use('/api/investors', investorRoutes);
 app.use('/api/notifications', notificationRoutes);
