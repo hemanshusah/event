@@ -8,8 +8,6 @@ on:
 
 env:
   NODE_VERSION: '18'
-  POSTGRES_VERSION: '15'
-  REDIS_VERSION: '7'
 
 jobs:
   # Lint and format check
@@ -24,10 +22,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install backend dependencies
+        run: |
+          cd backend/api-gateway
+          npm ci
+
+      - name: Install web admin dependencies
+        run: |
+          cd web-admin
+          npm ci
+
+      - name: Install mobile dependencies
+        run: |
+          cd mobile-apps/ios
+          npm ci
 
       - name: Lint backend
         run: |
@@ -80,10 +89,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install backend dependencies
+        run: |
+          cd backend/api-gateway
+          npm ci
 
       - name: Setup test database
         run: |
@@ -117,10 +127,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install web admin dependencies
+        run: |
+          cd web-admin
+          npm ci
 
       - name: Run web admin tests
         run: |
@@ -146,10 +157,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install mobile dependencies
+        run: |
+          cd mobile-apps/ios
+          npm ci
 
       - name: Run mobile tests
         run: |
@@ -175,14 +187,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd backend/api-gateway && npm ci
+          cd ../../web-admin && npm ci
+          cd ../mobile-apps/ios && npm ci
 
       - name: Run security audit
         run: |
-          npm audit --audit-level moderate
           cd backend/api-gateway && npm audit --audit-level moderate
           cd ../../web-admin && npm audit --audit-level moderate
           cd ../mobile-apps/ios && npm audit --audit-level moderate
@@ -207,10 +220,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd backend/api-gateway && npm ci
+          cd ../../web-admin && npm ci
+          cd ../mobile-apps/ios && npm ci
 
       - name: Build backend
         run: |
