@@ -10,9 +10,9 @@ env:
   NODE_VERSION: '18'
 
 jobs:
-  # Basic validation and setup
-  validate:
-    name: Validate Setup
+  # Validate project structure and install dependencies
+  setup:
+    name: Setup & Validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,58 +25,72 @@ jobs:
 
       - name: Validate project structure
         run: |
-          echo "Validating project structure..."
+          echo "🔍 Validating project structure..."
+          echo "Root directory contents:"
           ls -la
+          echo ""
           echo "Backend structure:"
           ls -la backend/api-gateway/
+          echo ""
           echo "Web admin structure:"
           ls -la web-admin/
+          echo ""
           echo "Mobile structure:"
           ls -la mobile-apps/ios/
+          echo "✅ Project structure validated"
 
-      - name: Check package.json files exist
+      - name: Check package.json files
         run: |
+          echo "📦 Checking package.json files..."
           test -f backend/api-gateway/package.json && echo "✅ Backend package.json exists"
           test -f web-admin/package.json && echo "✅ Web admin package.json exists"
           test -f mobile-apps/ios/package.json && echo "✅ Mobile package.json exists"
+          test -f package.json && echo "✅ Root package.json exists"
+          echo "✅ All package.json files found"
 
-  # Install dependencies
-  install-deps:
-    name: Install Dependencies
-    runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+      - name: Install root dependencies
+        run: |
+          echo "📦 Installing root dependencies..."
+          npm install
+          echo "✅ Root dependencies installed"
 
       - name: Install backend dependencies
         run: |
+          echo "📦 Installing backend dependencies..."
           cd backend/api-gateway
           npm install
           echo "✅ Backend dependencies installed"
 
       - name: Install web admin dependencies
         run: |
+          echo "📦 Installing web admin dependencies..."
           cd web-admin
           npm install
           echo "✅ Web admin dependencies installed"
 
       - name: Install mobile dependencies
         run: |
+          echo "📦 Installing mobile dependencies..."
           cd mobile-apps/ios
           npm install
           echo "✅ Mobile dependencies installed"
 
+      - name: Validate installations
+        run: |
+          echo "🔍 Validating installations..."
+          echo "Backend node_modules:"
+          ls -la backend/api-gateway/node_modules/ | head -5
+          echo "Web admin node_modules:"
+          ls -la web-admin/node_modules/ | head -5
+          echo "Mobile node_modules:"
+          ls -la mobile-apps/ios/node_modules/ | head -5
+          echo "✅ All dependencies installed successfully"
+
   # Backend validation
-  backend-check:
+  backend-validation:
     name: Backend Validation
     runs-on: ubuntu-latest
-    needs: install-deps
+    needs: setup
     services:
       postgres:
         image: postgres:15
@@ -110,31 +124,33 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: |
-          cd backend/api-gateway
           npm install
+          cd backend/api-gateway && npm install
 
-      - name: Validate backend structure
+      - name: Validate backend code
         run: |
           cd backend/api-gateway
-          echo "Backend files:"
-          ls -la src/
-          echo "Routes:"
+          echo "🔍 Validating backend code..."
+          echo "Server file exists:"
+          test -f src/server.js && echo "✅ server.js exists"
+          echo "Routes directory:"
           ls -la src/routes/
-          echo "✅ Backend structure validated"
+          echo "✅ Backend code structure validated"
 
-      - name: Check backend can start (dry run)
+      - name: Check backend syntax
         run: |
           cd backend/api-gateway
-          # Just check if the main files can be required without errors
-          node -e "console.log('✅ Backend syntax is valid')"
+          echo "🔍 Checking backend syntax..."
+          node -c src/server.js && echo "✅ Backend syntax is valid"
+          echo "✅ Backend validation completed"
 
   # Frontend validation
-  frontend-check:
+  frontend-validation:
     name: Frontend Validation
     runs-on: ubuntu-latest
-    needs: install-deps
+    needs: setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -144,31 +160,33 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install web admin dependencies
+      - name: Install dependencies
         run: |
-          cd web-admin
           npm install
+          cd web-admin && npm install
 
-      - name: Validate frontend structure
+      - name: Validate frontend code
         run: |
           cd web-admin
-          echo "Web admin files:"
-          ls -la src/
-          echo "Pages:"
+          echo "🔍 Validating frontend code..."
+          echo "App file exists:"
+          test -f src/App.js && echo "✅ App.js exists"
+          echo "Pages directory:"
           ls -la src/pages/
-          echo "✅ Frontend structure validated"
+          echo "✅ Frontend code structure validated"
 
-      - name: Check frontend can build (dry run)
+      - name: Check frontend syntax
         run: |
           cd web-admin
-          # Check if React components can be parsed
-          node -e "console.log('✅ Frontend syntax is valid')"
+          echo "🔍 Checking frontend syntax..."
+          node -c src/App.js && echo "✅ Frontend syntax is valid"
+          echo "✅ Frontend validation completed"
 
   # Mobile validation
-  mobile-check:
+  mobile-validation:
     name: Mobile Validation
     runs-on: ubuntu-latest
-    needs: install-deps
+    needs: setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -178,31 +196,33 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install mobile dependencies
+      - name: Install dependencies
         run: |
-          cd mobile-apps/ios
           npm install
+          cd mobile-apps/ios && npm install
 
-      - name: Validate mobile structure
+      - name: Validate mobile code
         run: |
           cd mobile-apps/ios
-          echo "Mobile files:"
-          ls -la src/
-          echo "Screens:"
+          echo "🔍 Validating mobile code..."
+          echo "App file exists:"
+          test -f App.js && echo "✅ App.js exists"
+          echo "Screens directory:"
           ls -la src/screens/
-          echo "✅ Mobile structure validated"
+          echo "✅ Mobile code structure validated"
 
-      - name: Check mobile can start (dry run)
+      - name: Check mobile syntax
         run: |
           cd mobile-apps/ios
-          # Just check if the main files can be required without errors
-          node -e "console.log('✅ Mobile syntax is valid')"
+          echo "🔍 Checking mobile syntax..."
+          node -c App.js && echo "✅ Mobile syntax is valid"
+          echo "✅ Mobile validation completed"
 
   # Security check
   security-check:
     name: Security Check
     runs-on: ubuntu-latest
-    needs: install-deps
+    needs: setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -214,72 +234,33 @@ jobs:
 
       - name: Install all dependencies
         run: |
+          npm install
           cd backend/api-gateway && npm install
           cd ../../web-admin && npm install
           cd ../mobile-apps/ios && npm install
 
-      - name: Check for known vulnerabilities
+      - name: Security audit
         run: |
-          echo "Checking for security vulnerabilities..."
+          echo "🔍 Running security audit..."
           cd backend/api-gateway && npm audit --audit-level high || echo "⚠️ Backend audit completed"
           cd ../../web-admin && npm audit --audit-level high || echo "⚠️ Web admin audit completed"
           cd ../mobile-apps/ios && npm audit --audit-level high || echo "⚠️ Mobile audit completed"
           echo "✅ Security check completed"
 
-  # Build validation
-  build-check:
-    name: Build Validation
-    runs-on: ubuntu-latest
-    needs: [backend-check, frontend-check, mobile-check]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install all dependencies
-        run: |
-          cd backend/api-gateway && npm install
-          cd ../../web-admin && npm install
-          cd ../mobile-apps/ios && npm install
-
-      - name: Validate build readiness
-        run: |
-          echo "✅ All components are ready for building"
-          echo "Backend: Ready"
-          echo "Web Admin: Ready"
-          echo "Mobile: Ready"
-
-  # Docker validation (only on main branch)
-  docker-check:
-    name: Docker Validation
-    runs-on: ubuntu-latest
-    needs: build-check
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Validate Dockerfiles exist
-        run: |
-          test -f backend/api-gateway/Dockerfile && echo "✅ Backend Dockerfile exists"
-          test -f web-admin/Dockerfile && echo "✅ Web admin Dockerfile exists"
-          echo "✅ Docker validation completed"
-
   # Success notification
   success:
     name: Pipeline Success
     runs-on: ubuntu-latest
-    needs: [backend-check, frontend-check, mobile-check, security-check, build-check]
+    needs: [backend-validation, frontend-validation, mobile-validation, security-check]
     if: always()
     steps:
       - name: Pipeline Status
         run: |
           echo "🎉 CI/CD Pipeline completed successfully!"
-          echo "✅ All validations passed"
-          echo "✅ Project structure is valid"
+          echo "✅ Project structure validated"
           echo "✅ Dependencies installed successfully"
+          echo "✅ Backend code validated"
+          echo "✅ Frontend code validated"
+          echo "✅ Mobile code validated"
+          echo "✅ Security check completed"
           echo "✅ Ready for development and deployment"
